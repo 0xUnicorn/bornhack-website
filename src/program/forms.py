@@ -28,6 +28,13 @@ class SpeakerProposalForm(forms.ModelForm):
             "event_conflicts",
         ]
 
+    def create_label_text(self, field: str, text: str):
+        self.fields[field].label(text)
+
+    def create_help_text(self, field: str, text: str):
+        self.fields[field].help_text(text)
+
+
     def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
         """
         initialise the form and adapt based on event_type
@@ -63,28 +70,21 @@ class SpeakerProposalForm(forms.ModelForm):
             return
 
         if event_type.name == "Debate":
+
             # fix label and help_text for the name field
-            self.fields["name"].label = "Guest Name"
-            self.fields[
-                "name"
-            ].help_text = (
-                "The name of a debate guest. Can be a real name or an alias (public)."
-            )
+            self.create_label_text("name", "Guest Name")
+            self.create_help_text("name", "The name of a debate guest. Can be a real name or an alias (public).")
 
             # fix label and help_text for the email field
-            self.fields["email"].label = "Guest Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for this guest. Will default to the logged-in users email if left empty (not public)."
+            self.create_label_text("email", "Guest Email")
+            self.create_help_text("email", "The email for this guest. Will default to the logged-in users email if left empty (not public).")
 
             # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Guest Biography"
-            self.fields["biography"].help_text = "The biography of the guest (public)."
+            self.create_label_text("biography", "Guest Biography")
+            self.create_help_text("biography", "The biography of the guest (public).")
 
             # fix label and help_text for the submission_notes field
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this guest (not public)."
+            self.create_help_text("submission_notes", "Private notes regarding this guest (not public).")
 
             # no free tickets for debates
             del self.fields["needs_oneday_ticket"]
