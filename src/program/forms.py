@@ -11,22 +11,20 @@ from .models import SpeakerProposal
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class SpeakerProposalForm(forms.ModelForm):
+class ProposalBase:
     """
-    The SpeakerProposalForm. Takes a list of EventTypes in __init__,
-    and changes fields accordingly if the list has 1 element.
+    The ProposalBaseForm. Defines shared properties between the,
+    different ProposalForm types.
     """
 
-    class Meta:
-        model = SpeakerProposal
-        fields = [
-            "name",
-            "email",
-            "biography",
-            "needs_oneday_ticket",
-            "submission_notes",
-            "event_conflicts",
-        ]
+    TALK = "Talk"
+    KEYNOTE = "Keynote"
+    LIGHTNING_TALK = "Lightning Talk"
+    DEBATE = "Debate"
+    MUSIC_ACT = "Music Act"
+    RECREATIONAL_EVENT = "Recreational Event"
+    WORKSHOP = "Workshop"
+    MEETUP = "Meetup"
 
     def add_label_text(self, field, label):
         self.fields[field].label = label
@@ -62,9 +60,27 @@ class SpeakerProposalForm(forms.ModelForm):
         text = f"Private notes regarding this {placeholder} (not public)."
         self.add_help_text("submission_notes", text)
 
+
+class SpeakerProposalForm(ProposalBase, forms.ModelForm):
+    """
+    The SpeakerProposalForm. Takes a list of EventTypes in __init__,
+    and changes fields accordingly if the list has 1 element.
+    """
+
+    class Meta:
+        model = SpeakerProposal
+        fields = [
+            "name",
+            "email",
+            "biography",
+            "needs_oneday_ticket",
+            "submission_notes",
+            "event_conflicts",
+        ]
+
     def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
         """
-        initialise the form and adapt based on event_type
+        Initialise the form and adapt based on event_type
         """
         super().__init__(*args, **kwargs)
 
@@ -96,140 +112,53 @@ class SpeakerProposalForm(forms.ModelForm):
             # we have no event_type to customize the form, use the default form
             return
 
-        if event_type.name == "Debate":
-            # fix label and help_text for the name field
-            self.name_label_text("Guest")
-            self.name_help_text("debate guest")
+        if event_type.name in [self.TALK, self.KEYNOTE]:
+            label = "Speaker"
+            help_text = "speaker"
 
-            # fix label and help_text for the email field
-            self.email_label_text("Guest")
-            self.email_help_text("guest")
+        elif event_type.name in [self.LIGHTNING_TALK]:
+            label = "Speaker"
+            help_text = "speaker"
+            # no free tickets for these event types
+            del self.fields["needs_oneday_ticket"]
 
-            # fix label and help_text for the biograpy field
-            self.biography_label_text("Guest")
-            self.biography_help_text("guest")
+        elif event_type.name in [self.WORKSHOP, self.RECREATIONAL_EVENT, self.MEETUP]:
+            label = "Host"
+            help_text = "host"
+            # no free tickets for these event types
+            del self.fields["needs_oneday_ticket"]
 
-            # fix label and help_text for the submission_notes field
-            self.submission_notes_help_text("guest")
-
+        elif event_type.name == self.DEBATE:
+            label = "Guest"
+            help_text = "guest"
             # no free tickets for debates
             del self.fields["needs_oneday_ticket"]
 
-        elif event_type.name == "Lightning Talk":
-            # fix label and help_text for the name field
-            self.name_label_text("Speaker")
-            self.name_help_text("speaker")
-
-            # fix label and help_text for the email field
-            self.email_label_text("Speaker")
-            self.email_help_text("speaker")
-
-            # fix label and help_text for the biograpy field
-            self.biography_label_text("Speaker")
-            self.biography_help_text("speaker")
-
-            # fix label and help_text for the submission_notes field
-            self.submission_notes_help_text("speaker")
-
-            # no free tickets for lightning talks
-            del self.fields["needs_oneday_ticket"]
-
-        elif event_type.name == "Music Act":
-            # fix label and help_text for the name field
-            self.name_label_text("Artist")
-            self.name_help_text("artist")
-
-            # fix label and help_text for the email field
-            self.email_label_text("Artist")
-            self.email_help_text("artist")
-
-            # fix label and help_text for the biograpy field
-            self.biography_label_text("Artist")
-            self.biography_help_text("artist")
-
-            # fix label and help_text for the submission_notes field
-            self.submission_notes_help_text("artist")
-
-            # no oneday tickets for music acts
-            del self.fields["needs_oneday_ticket"]
-
-        elif event_type.name == "Talk" or event_type.name == "Keynote":
-            # fix label and help_text for the name field
-            self.name_label_text("Speaker")
-            self.name_help_text("speaker")
-
-            # fix label and help_text for the email field
-            self.email_label_text("Speaker")
-            self.email_help_text("speaker")
-
-            # fix label and help_text for the biograpy field
-            self.biography_label_text("Speaker")
-            self.biography_help_text("speaker")
-
-            # fix label and help_text for the submission_notes field
-            self.submission_notes_help_text("speaker")
-
-        elif event_type.name == "Workshop":
-            # fix label and help_text for the name field
-            self.name_label_text("Host")
-            self.name_help_text("workshop host")
-
-            # fix label and help_text for the email field
-            self.email_label_text("Host")
-            self.email_help_text("host")
-
-            # fix label and help_text for the biograpy field
-            self.biography_label_text("Host")
-            self.biography_help_text("host")
-
-            # fix label and help_text for the submission_notes field
-            self.submission_notes_help_text("host")
-
-            # no free tickets for workshops
-            del self.fields["needs_oneday_ticket"]
-
-        elif event_type.name == "Recreational Event":
-            # fix label and help_text for the name field
-            self.name_label_text("Host")
-            self.name_help_text("event host")
-
-            # fix label and help_text for the email field
-            self.email_label_text("Host")
-            self.email_help_text("host")
-
-            # fix label and help_text for the biograpy field
-            self.biography_label_text("Host")
-            self.biography_help_text("host")
-
-            # fix label and help_text for the submission_notes field
-            self.submission_notes_help_text("host")
-
-            # no free tickets for recreational events
-            del self.fields["needs_oneday_ticket"]
-
-        elif event_type.name == "Meetup":
-            # fix label and help_text for the name field
-            self.name_label_text("Host")
-            self.name_help_text("meetup host")
-
-            # fix label and help_text for the email field
-            self.email_label_text("Host")
-            self.email_help_text("host")
-
-            # fix label and help_text for the biograpy field
-            self.biography_label_text("Host")
-            self.biography_help_text("host")
-
-            # fix label and help_text for the submission_notes field
-            self.submission_notes_help_text("host")
-
-            # no free tickets for meetups
+        elif event_type.name == self.MUSIC_ACT:
+            label = "Artist"
+            help_text = "artist"
+            # no free tickets for music acts
             del self.fields["needs_oneday_ticket"]
 
         else:
             raise ImproperlyConfigured(
                 f"Unsupported event type '{event_type.name}', don't know which form class to use",
             )
+
+        # fix label and help_text for the name field
+        self.name_label_text(label)
+        self.name_help_text(help_text)
+
+        # fix label and help_text for the email field
+        self.email_label_text(label)
+        self.email_help_text(help_text)
+
+        # fix label and help_text for the biograpy field
+        self.biography_label_text(label)
+        self.biography_help_text(help_text)
+
+        # fix label and help_text for the submission_notes field
+        self.submission_notes_help_text(help_text)
 
 
 class EventProposalForm(forms.ModelForm):
