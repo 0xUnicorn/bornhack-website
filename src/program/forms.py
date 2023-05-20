@@ -28,12 +28,39 @@ class SpeakerProposalForm(forms.ModelForm):
             "event_conflicts",
         ]
 
-    def create_label_text(self, field: str, text: str):
-        self.fields[field].label(text)
+    def add_label_text(self, field, label):
+        self.fields[field].label = label
 
-    def create_help_text(self, field: str, text: str):
-        self.fields[field].help_text(text)
+    def add_help_text(self, field, help_text):
+        self.fields[field].help_text = help_text
 
+    def name_label_text(self, placeholder):
+        text = f"{placeholder} Name"
+        self.add_label_text("name", text)
+
+    def name_help_text(self, placeholder):
+        text = f"The name of the {placeholder}. Can be a real name or an alias (public)."
+        self.add_help_text("name", text)
+
+    def email_label_text(self, placeholder):
+        text = f"{placeholder} Email"
+        self.add_label_text("email", text)
+
+    def email_help_text(self, placeholder):
+        text = f"The email for this {placeholder}. Will default to the logged-in users email if left empty (not public)."
+        self.add_help_text("email", text)
+
+    def biography_label_text(self, placeholder):
+        text = f"{placeholder} Biography"
+        self.add_label_text("biography", text)
+
+    def biography_help_text(self, placeholder):
+        text = f"The biography of the {placeholder} (public)."
+        self.add_help_text("biography", text)
+
+    def submission_notes_help_text(self, placeholder):
+        text = f"Private notes regarding this {placeholder} (not public)."
+        self.add_help_text("submission_notes", text)
 
     def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
         """
@@ -70,178 +97,131 @@ class SpeakerProposalForm(forms.ModelForm):
             return
 
         if event_type.name == "Debate":
-
             # fix label and help_text for the name field
-            self.create_label_text("name", "Guest Name")
-            self.create_help_text("name", "The name of a debate guest. Can be a real name or an alias (public).")
+            self.name_label_text("Guest")
+            self.name_help_text("debate guest")
 
             # fix label and help_text for the email field
-            self.create_label_text("email", "Guest Email")
-            self.create_help_text("email", "The email for this guest. Will default to the logged-in users email if left empty (not public).")
+            self.email_label_text("Guest")
+            self.email_help_text("guest")
 
             # fix label and help_text for the biograpy field
-            self.create_label_text("biography", "Guest Biography")
-            self.create_help_text("biography", "The biography of the guest (public).")
+            self.biography_label_text("Guest")
+            self.biography_help_text("guest")
 
             # fix label and help_text for the submission_notes field
-            self.create_help_text("submission_notes", "Private notes regarding this guest (not public).")
+            self.submission_notes_help_text("guest")
 
             # no free tickets for debates
             del self.fields["needs_oneday_ticket"]
 
         elif event_type.name == "Lightning Talk":
             # fix label and help_text for the name field
-            self.fields["name"].label = "Speaker Name"
-            self.fields[
-                "name"
-            ].help_text = (
-                "The name of the speaker. Can be a real name or an alias (public)."
-            )
+            self.name_label_text("Speaker")
+            self.name_help_text("speaker")
 
             # fix label and help_text for the email field
-            self.fields["email"].label = "Speaker Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for this speaker. Will default to the logged-in users email if left empty. (not public)"
+            self.email_label_text("Speaker")
+            self.email_help_text("speaker")
 
             # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Speaker Biography"
-            self.fields["biography"].help_text = "The biography of the speaker (public)"
+            self.biography_label_text("Speaker")
+            self.biography_help_text("speaker")
 
             # fix label and help_text for the submission_notes field
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this speaker (not public)."
+            self.submission_notes_help_text("speaker")
 
             # no free tickets for lightning talks
             del self.fields["needs_oneday_ticket"]
 
         elif event_type.name == "Music Act":
             # fix label and help_text for the name field
-            self.fields["name"].label = "Artist Name"
-            self.fields[
-                "name"
-            ].help_text = (
-                "The name of the artist. Can be a real name or artist alias (public)."
-            )
+            self.name_label_text("Artist")
+            self.name_help_text("artist")
 
             # fix label and help_text for the email field
-            self.fields["email"].label = "Artist Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for this artist. Will default to the logged-in users email if left empty (not public)."
+            self.email_label_text("Artist")
+            self.email_help_text("artist")
 
             # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Artist Description"
-            self.fields[
-                "biography"
-            ].help_text = "The description of the artist (public)."
+            self.biography_label_text("Artist")
+            self.biography_help_text("artist")
 
             # fix label and help_text for the submission_notes field
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this artist (not public)."
+            self.submission_notes_help_text("artist")
 
             # no oneday tickets for music acts
             del self.fields["needs_oneday_ticket"]
 
         elif event_type.name == "Talk" or event_type.name == "Keynote":
             # fix label and help_text for the name field
-            self.fields["name"].label = "Speaker Name"
-            self.fields[
-                "name"
-            ].help_text = (
-                "The name of the speaker. Can be a real name or an alias (public)."
-            )
+            self.name_label_text("Speaker")
+            self.name_help_text("speaker")
 
             # fix label and help_text for the email field
-            self.fields["email"].label = "Speaker Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for this speaker. Will default to the logged-in users email if left empty (not public)."
+            self.email_label_text("Speaker")
+            self.email_help_text("speaker")
 
             # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Speaker Biography"
-            self.fields[
-                "biography"
-            ].help_text = "The biography of the speaker (public)."
+            self.biography_label_text("Speaker")
+            self.biography_help_text("speaker")
 
             # fix label and help_text for the submission_notes field
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this speaker (not public)"
+            self.submission_notes_help_text("speaker")
 
         elif event_type.name == "Workshop":
             # fix label and help_text for the name field
-            self.fields["name"].label = "Host Name"
-            self.fields[
-                "name"
-            ].help_text = "The name of the workshop host. Can be a real name or an alias (public)."
+            self.name_label_text("Host")
+            self.name_help_text("workshop host")
 
             # fix label and help_text for the email field
-            self.fields["email"].label = "Host Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (not public)."
+            self.email_label_text("Host")
+            self.email_help_text("host")
 
             # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Host Biography"
-            self.fields["biography"].help_text = "The biography of the host (public)."
+            self.biography_label_text("Host")
+            self.biography_help_text("host")
 
             # fix label and help_text for the submission_notes field
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this host (not public)."
+            self.submission_notes_help_text("host")
 
             # no free tickets for workshops
             del self.fields["needs_oneday_ticket"]
 
         elif event_type.name == "Recreational Event":
             # fix label and help_text for the name field
-            self.fields["name"].label = "Host Name"
-            self.fields["name"].help_text = "Can be a real name or an alias (public)."
+            self.name_label_text("Host")
+            self.name_help_text("event host")
 
             # fix label and help_text for the email field
-            self.fields["email"].label = "Host Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (not public)."
+            self.email_label_text("Host")
+            self.email_help_text("host")
 
             # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Host Biography"
-            self.fields["biography"].help_text = "The biography of the host (public)."
+            self.biography_label_text("Host")
+            self.biography_help_text("host")
 
             # fix label and help_text for the submission_notes field
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this host (not public)."
+            self.submission_notes_help_text("host")
 
             # no free tickets for recreational events
             del self.fields["needs_oneday_ticket"]
 
         elif event_type.name == "Meetup":
             # fix label and help_text for the name field
-            self.fields["name"].label = "Host Name"
-            self.fields[
-                "name"
-            ].help_text = (
-                "The name of the meetup host. Can be a real name or an alias (public)."
-            )
+            self.name_label_text("Host")
+            self.name_help_text("meetup host")
 
             # fix label and help_text for the email field
-            self.fields["email"].label = "Host Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (not public)."
+            self.email_label_text("Host")
+            self.email_help_text("host")
 
             # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Host Biography"
-            self.fields["biography"].help_text = "The biography of the host."
+            self.biography_label_text("Host")
+            self.biography_help_text("host")
 
             # fix label and help_text for the submission_notes field
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this host (not public)."
+            self.submission_notes_help_text("host")
 
             # no free tickets for meetups
             del self.fields["needs_oneday_ticket"]
