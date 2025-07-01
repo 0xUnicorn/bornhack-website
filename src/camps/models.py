@@ -15,6 +15,9 @@ from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
 from psycopg2.extras import DateTimeTZRange
 
+from tickets.models import PrizeTicket
+from tickets.models import ShopTicket
+from tickets.models import SponsorTicket
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 
@@ -309,3 +312,18 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
     def event_slots(self):
         EventSlot = apps.get_model("program", "EventSlot")
         return EventSlot.objects.filter(event_session__in=self.event_sessions.all())
+
+    @property
+    def checked_in_adults_full_week(self) -> int:
+        """
+        Return the count of adult tickets checked in and being valid for today
+        """
+        ticket_name = "Adult Full Week"
+        shop_tickets = ShopTicket.objects.filter(ticket_type__name__contains=ticket_name).filter(ticket_type__camp=self)
+        sponsor_tickets = SponsorTicket.objects.filter(ticket_type__name__contains=ticket_name).filter(ticket_type__camp=self)
+        prize_tickets = PrizeTicket.objects.filter(ticket_type__name__contains=ticket_name).filter(ticket_type__camp=self)
+        return shop_tickets.count()
+
+# TODO: Add 'todays_participant' property, returning how many adult/kids daily ticket an weekly tickets are checked in
+# maybe add 'childrens_checked_in' and a 'adults_checked_in' property, with total checked in today.
+

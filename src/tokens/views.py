@@ -34,7 +34,6 @@ from utils.models import CampReadOnlyModeError
 
 from .models import Token
 from .models import TokenFind
-from .models import TokenCategory
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 

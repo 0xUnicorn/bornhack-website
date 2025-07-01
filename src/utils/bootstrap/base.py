@@ -2206,9 +2206,19 @@ class Bootstrap:
         self.create_camps(camps)
         self.create_users(16)
         self.create_event_types()
+        self.create_product_categories()
         teams = {}
         for camp, read_only in self.camps:
             year = camp.camp.lower.year
+
+            if year <= settings.UPCOMING_CAMP_YEAR:
+                ticket_types = self.create_camp_ticket_types(camp)
+                camp_products = self.create_camp_products(
+                    camp,
+                    self.product_categories,
+                    ticket_types,
+                )
+                self.create_orders(self.users, camp_products)
 
             teams[year] = self.create_camp_teams(camp)
             self.create_camp_team_memberships(camp, teams[year], self.users)
