@@ -465,7 +465,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         return shop_tickets + sponsor_tickets + prize_tickets
 
     @property
-    def participant_count(self) -> int:
+    def todays_participant_count(self) -> int:
         """Retrieve the participant count for all used 'full week' tickets
         and todays used 'one day' tickets.
         """

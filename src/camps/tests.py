@@ -212,4 +212,4 @@ class TestCampModel(BornhackTestBase):
         child_one_day.used_at = timezone.localtime()
         child_one_day.save()
 
-        assert self.camp.participant_count == 4
+        assert self.camp.todays_participant_count == 4
