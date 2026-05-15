@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const defaultOptions = {
     chart: {
       background: 'undefined',
+      height: '400px',
       toolbar: {
         show: false,
       },
@@ -60,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function () {
     chart: {
       ...defaultOptions.chart,
       type: 'radar',
-      height: '100%',
     },
     series: [
       {
@@ -85,12 +85,21 @@ document.addEventListener('DOMContentLoaded', function () {
     ...defaultOptions,
     chart: {
       ...defaultOptions.chart,
-      type: 'bar'
+      type: 'line',
     },
-    series: [{
-      name: 'Tokens found',
-      data: widgets.token_activity.chart.series,
-    }],
+   stroke: {
+      curve: 'smooth',
+    },
+    series: [
+      {
+        name: 'You',
+        data: widgets.token_activity.chart.series,
+      },
+      {
+        name: 'Best player',
+        data: widgets.token_activity.chart.series,
+      }
+    ],
     dataLabels: {
       enabled: false,
     },
@@ -99,6 +108,10 @@ document.addEventListener('DOMContentLoaded', function () {
       tickAmount: 12,
       tickPlacement: 'on',
     },
+    legend: {
+      position: 'top',
+      horizontalAlign: 'right',
+    }
   };
 
   var totalPlayers = new ApexCharts(

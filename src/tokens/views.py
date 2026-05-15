@@ -160,7 +160,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
         Calculate the percentage of tokens found in each category by all players.
         """
-        token_finds_qs = TokenFind.objects.filter(token=OuterRef("id"))
+        token_finds_qs = TokenFind.objects.filter(token=OuterRef("id")).filter(user=self.request.user)
         found_tokens_qs = Token.objects.filter(camp=self.request.camp).annotate(
             was_found=Exists(token_finds_qs),
         )
